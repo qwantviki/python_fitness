@@ -3,7 +3,10 @@ import datetime
 id = 0
 
 class Note:
-    def __init__(self, title, content, author):
+    """
+    Класс заметок с заголовками, содержанием и автором
+    """
+    def __init__(self, title: str, content: str, author: str) -> None:
         self.id = None
         self.title = title
         self.content = content
@@ -11,12 +14,21 @@ class Note:
         self.created_at = datetime.datetime.now().isoformat()
 
     def is_valid(self) -> bool:
+        """
+        Проверка на правильность заполнения:
+        title и author не пустые, а длина содержимого не более 300 символов.
+        :return: Bool
+        """
         if self.title == "" or len(self.content) > 300 or self.author == "":
             return False
         else:
             return True
 
     def to_dict(self) -> dict:
+        """
+        Возвращает объект класса в виде словаря
+        :return: dict
+        """
         return {
             "id": self.id,
             "title": self.title,
