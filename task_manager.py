@@ -59,6 +59,7 @@ class Notebook:
         """
         note = Note(title, content, author)
         if note.is_valid():
+            note.id = self._next_id
             self._next_id += 1
             self.notes_list.append(note)
             return note
