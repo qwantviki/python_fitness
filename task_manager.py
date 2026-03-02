@@ -1,6 +1,7 @@
 import datetime
 
-id = 0
+# id = 0
+
 
 class Note:
     """
@@ -37,27 +38,88 @@ class Note:
             "created_at": self.created_at
         }
 
-def create_note(title: str, content: str, author: str) -> dict | None:
+
+class Notebook:
     """
-    Сумка создает словарь заметок с автоматическим счетчиком id,
-    а также указанием даты создания заметки
-    :param title: название заметки
-    :param content: суть заметки, ее содержание
-    :param author: имя автора заметки
-    :return: Заметку в виде словаря или None, если ошибка
+    Класс представляет собой коллекцию заметок.
+    Автоматически присваивает номер новой заметке.
     """
-    global id
-    id += 1
-    if title == "" or author == "" or len(content) > 300:
-        return None
-    else:
-        return {
-            "id": id,
-            "title": title,
-            "content": content,
-            "author": author,
-            "created_at": datetime.datetime.now().isoformat(),
-        }
+    def __init__(self):
+        self._next_id = 1
+        self.notes_list = []
+
+    def add_note(self, title: str, content: str, author: str) -> Note | None:
+        """
+        Добавляет новую заметку в коллекцию.
+        Перед добавлением проверяет на правильность заполнения.
+        :param title: название заметки
+        :param content: содержание заметки
+        :param author: автор заметки
+        :return: возвращает либо новую заметку, либо ничего
+        """
+        note = Note(title, content, author)
+        if note.is_valid():
+            self._next_id += 1
+            self.notes_list.append(note)
+            return note
+        else:
+            return None
+
+    def get_all_notes(self) -> list[Note]:
+        """
+        Получение полного списка заметок
+        :return: возвращает список добавленных заметок
+        """
+        return self.notes_list
+
+    def find_by_author(self, author: str) -> list[Note] | None:
+        """
+        Ищет все заметки указанного автора.
+        :param author: имя автора
+        :return: возвращает либо список заметок, либо ничего.
+        """
+        found_notes = []
+        for note in self.notes_list:
+            if author in note.author:
+                found_notes.append(note)
+        if len(found_notes) == 0:
+            return None
+        else:
+            return found_notes
+
+    def delete_note(self, note_id: int) -> bool:
+        """
+        Функция удаления заметки с заданным id.
+        :param note_id: номер по порядку заметки
+        :return: возвращает true в случае удаления
+        """
+        for note in self.notes_list:
+            if note.id == note_id:
+                self.notes_list.remove(note)
+                return True
+        return False
+
+# def create_note(title: str, content: str, author: str) -> dict | None:
+#     """
+#     Сумка создает словарь заметок с автоматическим счетчиком id,
+#     а также указанием даты создания заметки
+#     :param title: название заметки
+#     :param content: суть заметки, ее содержание
+#     :param author: имя автора заметки
+#     :return: Заметку в виде словаря или None, если ошибка
+#     """
+#     global id
+#     id += 1
+#     if title == "" or author == "" or len(content) > 300:
+#         return None
+#     else:
+#         return {
+#             "id": id,
+#             "title": title,
+#             "content": content,
+#             "author": author,
+#             "created_at": datetime.datetime.now().isoformat(),
+#         }
 
 # note1 = create_note("Купить продукты", "Молоко, хлеб", "Иван")
 # print(note1)
@@ -69,16 +131,36 @@ def create_note(title: str, content: str, author: str) -> dict | None:
 # print(note3)
 
 # Создаем два объекта
-note1 = Note("Купить продукты", "Молоко, хлеб", "Иван")
-note2 = Note("", "Контент", "Петр")  # Пустой заголовок
-
-# Проверяем валидацию
-print(note1.is_valid())  # True
-print(note2.is_valid())  # False
-
-# Преобразуем в словарь (только если заметка валидна, но метод должен работать всегда)
-print(note1.to_dict())
-# Вывод: {'id': None, 'title': 'Купить продукты', 'content': 'Молоко, хлеб', 'author': 'Иван', 'created_at': '2026-02-28T12:00:00.123456'}
-
-print(note2.to_dict())
+# note1 = Note("Купить продукты", "Молоко, хлеб", "Иван")
+# note2 = Note("", "Контент", "Петр")  # Пустой заголовок
+#
+# # Проверяем валидацию
+# print(note1.is_valid())  # True
+# print(note2.is_valid())  # False
+#
+# # Преобразуем в словарь (только если заметка валидна, но метод должен работать всегда)
+# print(note1.to_dict())
+# # Вывод: {'id': None, 'title': 'Купить продукты', 'content': 'Молоко, хлеб', 'author': 'Иван', 'created_at': '2026-02-28T12:00:00.123456'}
+#
+# print(note2.to_dict())
 # Вывод: {'id': None, 'title': '', 'content': 'Контент', 'author': 'Петр', 'created_at': '2026-02-28T12:00:01.123456'}
+
+# Создаем записную книжку
+notebook = Notebook()
+
+# Добавляем заметки
+note1 = notebook.add_note("Купить продукты", "Молоко, хлеб", "Иван")
+note2 = notebook.add_note("", "Пустой заголовок", "Петр")  # Невалидная
+note3 = notebook.add_note("Заметка 2", "Какой-то контент", "Иван")
+
+print(f"Всего заметок: {len(notebook.get_all_notes())}")  # Должно быть 2
+print(f"ID первой заметки: {note1.id}")  # Должно быть 1
+print(f"ID третьей заметки: {note3.id}")  # Должно быть 2
+
+# Поиск по автору
+ivan_notes = notebook.find_by_author("Иван")
+print(f"Заметок у Ивана: {len(ivan_notes)}")  # Должно быть 2
+
+# Удаление
+notebook.delete_note(1)
+print(f"Осталось заметок: {len(notebook.get_all_notes())}")  # Должно быть 1
