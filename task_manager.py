@@ -81,7 +81,7 @@ class Notebook:
         """
         found_notes = []
         for note in self.notes_list:
-            if author in note.author:
+            if author == note.author:
                 found_notes.append(note)
         if len(found_notes) == 0:
             return None
