@@ -124,8 +124,18 @@ class Notebook:
         self.notes_list = []
         with open(filename, "r") as file:
             data = json.load(file)
-        for note in data:
-            self.add_note(note["title"], note["content"], note["author"])
+
+        max_id = 0
+
+        for note_data in data:
+            note = Note(note_data["title"], note_data["content"], note_data["author"])
+            note.id = note_data["id"]
+            note.created_at = note_data["created_at"]
+            self.notes_list.append(note)
+            if note.id > max_id:
+                max_id = note.id
+
+        self._next_id = max_id + 1
 
 # def create_note(title: str, content: str, author: str) -> dict | None:
 #     """
